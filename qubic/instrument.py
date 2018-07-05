@@ -26,7 +26,8 @@ from .utils import _compress_mask
 from .ripples import ConvolutionRippledGaussianOperator, BeamGaussianRippled
 
 __all__ = ['QubicInstrument',
-           'QubicMultibandInstrument']
+           'QubicMultibandInstrument',
+           'RealisticQubicMultibandInstrument']
 
 
 class Filter(object):
@@ -347,6 +348,22 @@ class QubicInstrument(Instrument):
             return IdentityOperator()
         return HomothetyOperator(self.filter.bandwidth)
 
+    
+    def get_hwp_operator_systemathics(self, sampling, scene):
+        """
+        Return the rotation matrix for the half-wave plate.
+
+        """
+        shape = (len(self), len(sampling))
+        if scene.kind == 'I':
+            return IdentityOperator(shapein=shape)
+        if scene.kind == 'QU':
+            return Rotation2dOperator(-4 * sampling.angle_hwp,
+                                      degrees=True, shapein=shape + (2,))
+        return Rotation3dOperator('X', -4 * sampling.angle_hwp,
+                                  degrees=True, shapein=shape + (3,))
+
+    
     def get_hwp_operator(self, sampling, scene):
         """
         Return the rotation matrix for the half-wave plate.
@@ -977,3 +994,12 @@ class QubicMultibandInstrument():
         return Nfreq_edges, nus_edge, nus, deltas, Delta, Nbbands
 
 
+class RealisticQubicMultibandInstrument():
+    """
+    The RealisticQubicMultibandInstrument class
+    expands the QubicMultibandInstrument objects including systemathic effects.
+    """
+    def __init__(self, d):
+        pass
+    
+        
