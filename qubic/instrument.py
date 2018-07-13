@@ -993,13 +993,4 @@ class QubicMultibandInstrument():
         Nbbands = len(nus)
         return Nfreq_edges, nus_edge, nus, deltas, Delta, Nbbands
 
-
-class RealisticQubicMultibandInstrument():
-    """
-    The RealisticQubicMultibandInstrument class
-    expands the QubicMultibandInstrument objects including systemathic effects.
-    """
-    def __init__(self, d):
-        pass
-    
         
