@@ -26,8 +26,7 @@ from .utils import _compress_mask
 from .ripples import ConvolutionRippledGaussianOperator, BeamGaussianRippled
 
 __all__ = ['QubicInstrument',
-           'QubicMultibandInstrument',
-           'RealisticQubicMultibandInstrument']
+           'QubicMultibandInstrument']
 
 
 class Filter(object):
