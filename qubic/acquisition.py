@@ -265,6 +265,40 @@ class QubicAcquisition(Acquisition):
         nu = self.instrument.filter.nu
         return self.scene.get_unit_conversion_operator(nu)
 
+    
+    def get_operator_systemathics(self):
+        """
+        Return the operator of the acquisition. Note that the operator is only
+        linear if the scene temperature is differential (absolute=False).
+
+        """
+        distribution = self.get_distribution_operator()
+        temp = self.get_unit_conversion_operator()
+        aperture = self.get_aperture_integration_operator()
+        filter = self.get_filter_operator()
+        projection = self.get_projection_operator()
+        hwp = self.get_hwp_operator()
+        polarizer = self.get_polarizer_operator()
+        integ = self.get_detector_integration_operator()
+        trans_inst = self.instrument.get_transmission_operator()
+        trans_atm = self.scene.atmosphere.transmission
+        response = self.get_detector_response_operator()
+
+        with rule_manager(inplace=True):
+            H_t = CompositionOperator([
+                response, trans_inst, integ, polarizer_t, hwp_t * projection,
+                filter, aperture, trans_atm, temp, distribution])
+            H_r = CompositionOperator([
+                response, trans_inst, integ, polarizer_t, hwp_r * projection,
+                polarizer_r, hwp_t * projection, filter, aperture, trans_atm,
+                temp, distribution])
+            H = H_t + H_r
+            
+        if self.scene == 'QU':
+            H = self.get_subtract_grid_operator()(H)
+        return H
+
+    
     def get_operator(self):
         """
         Return the operator of the acquisition. Note that the operator is only
